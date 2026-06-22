@@ -1,5 +1,0 @@
-
-> ximentest@0.0.0 build
-> tsc && vite build
-
-src/components/VariableTable.tsx(81,23): error TS2304: Cannot find name 'FilterConfirmProps'.

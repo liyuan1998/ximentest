@@ -1,7 +1,0 @@
-
-> ximentest@0.0.0 build
-> tsc && vite build ; type e:\ximenz\ximentest\build_result.txt
-
-src/components/VariableTable.tsx(21,9): error TS6133: 'loadRows' is declared but its value is never read.
-src/components/VariableTable.tsx(29,27): error TS2304: Cannot find name 'useRef'.
-src/components/VariableTable.tsx(32,26): error TS6133: 'setDataTypeFilter' is declared but its value is never read.
