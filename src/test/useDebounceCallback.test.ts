@@ -1,17 +1,8 @@
-import { describe, expect, it, vi, afterEach } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useDebounceCallback } from "../hooks/useDebounceCallback";
 
 describe("useDebounceCallback", () => {
-  beforeEach(() => {
-    vi.useFakeTimers(); // 启用假定时器
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-    vi.useRealTimers(); // 恢复真实定时器
-  });
-
   it("should call callback immediately on first trigger", () => {
     const fn = vi.fn();
     const { result } = renderHook(() => useDebounceCallback(fn, 200));
@@ -33,22 +24,26 @@ describe("useDebounceCallback", () => {
   });
 
   it("should call callback again after delay period", () => {
+    vi.useFakeTimers(); // 启用假定时器
     const fn = vi.fn();
     const { result } = renderHook(() => useDebounceCallback(fn, 200));
 
     act(() => { result.current(); });
     expect(fn).toHaveBeenCalledTimes(1);
 
-    // 快进时间
+    // 快进时间，触发 setTimeout 回调
     act(() => {
       vi.advanceTimersByTime(201);
     });
 
     act(() => { result.current(); });
     expect(fn).toHaveBeenCalledTimes(2);
+
+    vi.useRealTimers(); // 恢复真实定时器
   });
 
   it("should use latest callback reference (no stale closure)", () => {
+    vi.useFakeTimers();
     const fn1 = vi.fn();
     const fn2 = vi.fn();
 
@@ -63,6 +58,7 @@ describe("useDebounceCallback", () => {
     // 更新回调
     rerender({ cb: fn2 });
 
+    // 快进时间，解除防抖锁定
     act(() => {
       vi.advanceTimersByTime(201);
     });
@@ -70,6 +66,8 @@ describe("useDebounceCallback", () => {
     act(() => { result.current(); });
     expect(fn2).toHaveBeenCalledTimes(1); // 应该调用最新回调
     expect(fn1).toHaveBeenCalledTimes(1); // 旧回调不应再被调用
+
+    vi.useRealTimers();
   });
 
   it("should default to 200ms delay", () => {
