@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* antd table header styling */
+.variable-table .ant-table-thead > tr > th {
+  background-color: #f8fafc !important;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Row hover effect */
+.variable-table .ant-table-tbody > tr:hover > td {
+  background-color: #f0f7ff !important;
+}
+
+/* Selected row highlight */
+.variable-table .ant-table-row-selected > td {
+  background-color: #e8f0fe !important;
+}
+
+/* Smooth transitions */
+.variable-table .ant-table-cell {
+  transition: background-color 0.15s ease;
+}
+
+/* Remove antd table default bottom border on last row */
+.variable-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+/*
+ * Fix: bordered 模式下行间粗横线
+ * antd bordered 表格每行 td 都有 border-bottom，
+ * 相邻行的上下边框叠加导致视觉上变粗。
+ * 方案：保留单条分隔线，用更浅的颜色 + 只保留上边框来实现。
+ */
+.variable-table .ant-table-tbody > tr > td {
+  border-bottom: none !important;
+  border-top: 1px solid #f0f0f0 !important;
+}
+
+/* 第一行不需要上边框，避免顶部双线 */
+.variable-table .ant-table-tbody > tr:first-child > td {
+  border-top: none !important;
+}
