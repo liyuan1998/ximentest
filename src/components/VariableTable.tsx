@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState } from "react";
 import { Table, App } from "antd";
 import type { TableColumnsType } from "antd";
 import type { VariableRow, DataType } from "../types/variable";
@@ -11,6 +11,7 @@ import {
 } from "./EditableCell";
 import { Toolbar } from "./Toolbar";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
+import { useDebounceCallback } from "../hooks/useDebounceCallback";
 
 export function VariableTable() {
   const rows = useVariableStore((s) => s.rows);
@@ -22,38 +23,21 @@ export function VariableTable() {
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
-  // 防抖标记：防止重复点击/按键
-  const addingRef = useRef(false);
-  const deletingRef = useRef(false);
+  const handleAddRow = useDebounceCallback(async () => {
+    await insertEmptyRow();
+    message.success("New row added");
+  });
 
-  const handleAddRow = useCallback(async () => {
-    if (addingRef.current) return;
-    addingRef.current = true;
-    try {
-      await insertEmptyRow();
-      message.success("New row added");
-    } finally {
-      // 200ms 内不允许重复触发
-      setTimeout(() => { addingRef.current = false; }, 200);
-    }
-  }, [insertEmptyRow, message]);
-
-  const handleDelete = useCallback(async () => {
-    if (deletingRef.current) return;
+  const handleDelete = useDebounceCallback(async () => {
     if (selectedRowKeys.length === 0) {
       message.warning("Please select at least one row to delete");
       return;
     }
-    deletingRef.current = true;
-    try {
-      const ids = selectedRowKeys as string[];
-      await deleteRows(ids);
-      setSelectedRowKeys([]);
-      message.success(`${ids.length} row(s) deleted`);
-    } finally {
-      setTimeout(() => { deletingRef.current = false; }, 200);
-    }
-  }, [selectedRowKeys, deleteRows, message]);
+    const ids = selectedRowKeys as string[];
+    await deleteRows(ids);
+    setSelectedRowKeys([]);
+    message.success(`${ids.length} row(s) deleted`);
+  });
 
   useKeyboardShortcuts({ onDelete: handleDelete, onAdd: handleAddRow });
 
